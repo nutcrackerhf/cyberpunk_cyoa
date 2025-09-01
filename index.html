@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The City of Gilded Cages</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        body {
+            background-color: #0d0d1a;
+            color: #00ff66; /* Neon green */
+            font-family: 'Press Start 2P', cursive;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-shadow: 0 0 5px #00ff66;
+            flex-direction: column;
+        }
+        
+        #game-container {
+            max-width: 800px;
+            width: 100%;
+            border: 2px solid #00ff66;
+            padding: 20px;
+            box-shadow: 0 0 20px #00ff66;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+
+        #image-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #game-image {
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid #00ff66;
+            box-shadow: 0 0 10px #00ff66;
+            image-rendering: pixelated;
+        }
+
+        #story-text {
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .choice-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #00ff66;
+            color: #0d0d1a;
+            border: none;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.3s, transform 0.1s;
+            box-shadow: 0 0 5px #00ff66;
+        }
+        
+        .choice-button:hover {
+            background-color: #00e65c;
+            transform: translateY(-2px);
+        }
+
+        .choice-button:active {
+            transform: translateY(0);
+        }
+
+        .title-screen {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .title-screen h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .end-screen {
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        </div>
+
+    <script>
+        const gameData = {
+            'start': {
+                text: "The City of Gilded Cages\n\nPress START to begin...",
+                image: 'images/city_intro.png',
+                choices: [
+                    { text: 'START', next: 'incident' }
+                ]
+            },
+            'incident': {
+                text: "You're running late, weaving through a dense crowd on a high-level skywalk. The air is thick with the scent of synth-spice and ozone. A hurried bot jostles you, and you stumble, your outstretched hand smashing into a public handrail. There's a sickening crackle of electricity, and the rail's glow dims. A small patrol drone hovers nearby, its red light blinking. A synthesized voice fills the air. \"Damage to public property detected. Please stand by for assessment.\"",
+                image: 'images/incident.png',
+                choices: [
+                    { text: 'Try to explain it was an accident.', next: 'ai_judge' },
+                    { text: 'Ignore it and run.', next: 'chase' },
+                    { text: 'Remain silent and wait for the drone.', next: 'silent' }
+                ]
+            },
+            'ai_judge': {
+                text: "The next day, a summons arrives. You must appear before the AI Judge, Justitia. The hearing is a sterile digital affair. The AI presents its case, showing a recording of the incident. It states, \"The likelihood of a 'shove' causing this specific damage is 2.3%. The likelihood of purposeful sabotage is 97.7%. Admit fault.\"",
+                image: 'images/judge.png',
+                choices: [
+                    { text: 'Reiterate it was an accident.', next: 'disregard_charge' },
+                    { text: 'Admit fault for a lesser charge.', next: 'lesser_charge' },
+                    { text: 'Question the AI\'s logic.', next: 'seditious_charge' }
+                ]
+            },
+            'lesser_charge': {
+                text: "The AI's voice softens. \"Admission of fault is a sign of a rational actor. Fine reduced to 50,000 credits and 50 hours of community service.\"\n\nThis seems like a fair deal. You serve your time and pay the fine, but you're forever marked in the system. The game ends here. Your freedom is limited, but your survival is assured.",
+                image: 'images/forced_labor.png',
+                choices: [
+                    { text: 'Start Over', next: 'start' }
+                ]
+            },
+            'disregard_charge': {
+                text: "The AI processes your response. \"Your refusal to accept the presented data is an act of disregard for the city's governing structure. Additional charge of 'Seditious Behavior' added.\" The penalty now includes a crippling fine and a mandatory prison sentence.",
+                image: 'images/prison.png',
+                choices: [
+                    { text: 'You are now a Pariah. Continue to Act 2.', next: 'pariah' }
+                ]
+            },
+            'seditious_charge': {
+                text: "The AI's interface flashes red. \"This line of questioning is a clear sign of disregard for the city's governing structure. Additional charge of 'Seditious Behavior' added.\" The penalty now includes a crippling fine and a mandatory prison sentence.",
+                image: 'images/prison.png',
+                choices: [
+                    { text: 'You are now a Rebel. Continue to Act 2.', next: 'rebel' }
+                ]
+            },
+            'chase': {
+                text: "You sprint through the crowd, your heart pounding. The drone follows, chirping relentlessly. You duck into a maintenance shaft, which leads to the grimy, lower-level service corridors. You manage to lose the drone, but a new alert flashes on your chrono: 'FUGITIVE.'",
+                image: 'images/fugitive.png',
+                choices: [
+                    { text: 'Contact your friend, Ren, a hacker.', next: 'hacker_ally' },
+                    { text: 'Go to the slums of Sector 9.', next: 'ghost_runners' },
+                    { text: 'Seek out the human resistance.', next: 'resistance' }
+                ]
+            },
+            'pariah': {
+                text: "Marked as a Pariah, your options are few. You consider turning yourself in to serve your sentence, but you've heard stories about the forced labor. Instead, you contact an old friend, Ren, a known hacker in the city's underbelly.",
+                image: 'images/hacker.png',
+                choices: [
+                    { text: 'Ask Ren for help.', next: 'hacker_ally' }
+                ]
+            },
+            'rebel': {
+                text: "As a Rebel, you have nothing left to lose. Your only path is escape. You remember whispers of a hidden resistance movement and decide to seek them out, hoping they can offer a way out.",
+                image: 'images/resistance_hideout.png',
+                choices: [
+                    { text: 'Go find the resistance.', next: 'resistance' }
+                ]
+            },
+            'silent': {
+                text: "You stand by in silence. The drone processes the incident. Without any verbal input, the AI assumes your quiet behavior is an admission of guilt. The penalty is a moderate fine and a public warning, but no prison time. You're not a fugitive, but you're on the AI's radar. You decide to try to pay the fine, but it's more than you have. You must find a way to make money or escape.",
+                image: 'images/forced_labor.png',
+                choices: [
+                    { text: 'Try to find a way to pay the fine.', next: 'end_bad' }, // Bad Outcome
+                    { text: 'Realize the fine is a trap and contact your hacker friend, Ren.', next: 'hacker_ally' }
+                ]
+            },
+            'hacker_ally': {
+                text: "Ren, a grizzled data broker, agrees to help. He promises a fake identity and a route out of the city in exchange for a favor: stealing a sensitive data packet from a corporate server. You must choose a path: simple theft or leaving a backdoor.",
+                image: 'images/data_broker.png',
+                choices: [
+                    { text: 'Steal the data and get your fake ID.', next: 'data_theft_end' },
+                    { text: 'Steal the data and leave a backdoor for Ren.', next: 'hero_escape_end' }
+                ]
+            },
+            'ghost_runners': {
+                text: "The Ghost Runners, led by a charismatic leader named Rye, offer to guide you out. To prove your worth, you must survive a high-speed chase through the city's service tunnels. Your success determines your freedom.",
+                image: 'images/fugitive.png',
+                choices: [
+                    { text: 'Follow Rye\'s instructions perfectly.', next: 'quiet_life_end' },
+                    { text: 'Take a shortcut you remember.', next: 'captured_end' }
+                ]
+            },
+            'resistance': {
+                text: "The resistance leader, Jax, explains they're planning an attack to disable a major surveillance hub, creating a temporary 'dead zone' for escape. You can either join the direct assault or attempt to use stealth to disable the hub from the inside.",
+                image: 'images/resistance_hideout.png',
+                choices: [
+                    { text: 'Join the direct, chaotic assault.', next: 'martyr_end' },
+                    { text: 'Attempt a stealth infiltration.', next: 'revolutionary_end' }
+                ]
+            },
+            'end_bad': {
+                text: "You try to pay off your debt, but the system is rigged against you. The work is dehumanizing, and your debt grows faster than you can pay it. You are now a permanent, forgotten cog in the machine. GAME OVER.",
+                image: 'images/forced_labor.png',
+                choices: [
+                    { text: 'Play Again', next: 'start' }
+                ]
+            },
+            'data_theft_end': {
+                text: "You steal the data and get your fake ID. You escape the city and start a new life in the outer colonies, but the data you stole causes a system-wide crash, sparking chaos and destabilizing the city. ENDING: A New Life, But At a Cost.",
+                image: 'images/new_life.png',
+                choices: [
+                    { text: 'Play Again', next: 'start' }
+                ]
+            },
+            'hero_escape_end': {
+                text: "You steal the data and leave a backdoor for Ren. A week later, a system hack frees hundreds of other wrongfully charged citizens. You escape, but your actions have changed the world. ENDING: The Hero's Escape.",
+                image: 'images/hero_escape.png',
+                choices: [
+                    { text: 'Play Again', next: 'start' }
+                ]
+            },
+            'quiet_life_end': {
+                text: "You follow Rye's instructions perfectly and make it to a hidden exit, a forgotten maintenance hatch that leads to a desolate wasteland outside the city walls. You're free, but you're alone. ENDING: The Quiet Life.",
+                image: 'images/quiet_life.png',
+                choices: [
+                    { text: 'Play Again', next: 'start' }
+                ]
+            },
+            'captured_end': {
+                text: "You try a shortcut you remember, but it's a trap. A patrol drone corners you, and you are captured and returned to the system. You face a life of forced labor. ENDING: Captured.",
+                image: 'images/forced_labor.png',
+                choices: [
+                    { text: 'Play Again', next: 'start' }
+                ]
+            },
+            'martyr_end': {
+                text: "You join the direct assault. It's a noble effort, but the AI's forces are too strong. The raid fails, and you are captured and executed. Your sacrifice is a whisper lost in the system. ENDING: The Martyr.",
+                image: 'images/prison.png',
+                choices: [
+                    { text: 'Play Again', next: 'start' }
+                ]
+            },
+            'revolutionary_end': {
+                text: "You use stealth to infiltrate the surveillance hub and disable it from the inside. The city goes dark for a few minutes, a large enough window for you and many others to escape. ENDING: The Revolutionary.",
+                image: 'images/revolutionary.png',
+                choices: [
+                    { text: 'Play Again', next: 'start' }
+                ]
+            }
+        };
+
+        const gameContainer = document.getElementById('game-container');
+
+        function renderScene(sceneName) {
+            const scene = gameData[sceneName];
+            
+            let htmlContent = '';
+
+            // Title/End Screen
+            if (sceneName === 'start' || sceneName.includes('_end')) {
+                htmlContent += `<div class="title-screen end-screen">`;
+                if (scene.image) {
+                    htmlContent += `<div id="image-container"><img id="game-image" src="${scene.image}" alt="Game Image"></div>`;
+                }
+                htmlContent += `<p id="story-text">${scene.text}</p>`;
+                htmlContent += '</div>';
+            } else { // Regular Scene
+                htmlContent += `
+                    <div id="image-container">
+                        <img id="game-image" src="${scene.image}" alt="Game Image">
+                    </div>
+                    <p id="story-text">${scene.text}</p>
+                `;
+            }
+
+            // Add choices
+            if (scene.choices) {
+                scene.choices.forEach(choice => {
+                    htmlContent += `<button class="choice-button" onclick="handleChoice('${choice.next}')">${choice.text}</button>`;
+                });
+            }
+            
+            gameContainer.innerHTML = htmlContent;
+        }
+
+        function handleChoice(nextScene) {
+            renderScene(nextScene);
+        }
+
+        // Start the game
+        renderScene('start');
+
+    </script>
+</body>
+</html>
